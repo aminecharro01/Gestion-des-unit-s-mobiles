@@ -17,6 +17,7 @@ from django.contrib import messages
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from io import BytesIO
+from openpyxl.utils import get_column_letter
 
 # Dashboard view
 @login_required
@@ -644,146 +645,131 @@ def profile_update(request):
     })
 
 def generate_unit_report(request, unit_id):
-    if not request.user.is_staff:
-        return HttpResponse("Unauthorized", status=403)
+    unit = get_object_or_404(MobileUnit, id=unit_id)
     
-    try:
-        unit = MobileUnit.objects.get(id=unit_id)
-    except MobileUnit.DoesNotExist:
-        return HttpResponse("Unit not found", status=404)
-
     # Create a new workbook and select the active worksheet
     wb = Workbook()
     ws = wb.active
-    ws.title = f"Rapport {unit.name}"
-
+    
     # Define styles
     title_font = Font(bold=True, size=14)
-    header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
-    header_font = Font(bold=True, color="FFFFFF")
+    header_font = Font(bold=True)
+    header_fill = PatternFill(start_color="CCCCCC", end_color="CCCCCC", fill_type="solid")
     center_alignment = Alignment(horizontal='center', vertical='center')
-
+    
     # Add title
-    ws.merge_cells('A1:H1')
-    ws['A1'] = f"Rapport d'Activité - {unit.name}"
+    ws['A1'] = f"Rapport de l'unité {unit.name}"
     ws['A1'].font = title_font
     ws['A1'].alignment = center_alignment
+    ws.merge_cells('A1:E1')
     
     # Add date
-    ws.merge_cells('A2:H2')
-    ws['A2'] = f"Généré le: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+    ws['A2'] = f"Date du rapport : {timezone.now().strftime('%d/%m/%Y')}"
     ws['A2'].alignment = center_alignment
-
+    ws.merge_cells('A2:E2')
+    
     # Unit Information
-    ws.merge_cells('A4:H4')
-    ws['A4'] = "Informations de l'Unité"
-    ws['A4'].font = title_font
-    ws['A4'].alignment = center_alignment
-
+    current_row = 4
+    ws[f'A{current_row}'] = "Informations de l'unité"
+    ws[f'A{current_row}'].font = header_font
+    ws[f'A{current_row}'].fill = header_fill
+    ws.merge_cells(f'A{current_row}:E{current_row}')
+    
     unit_info = [
-        ["Nom de l'unité", unit.name],
+        ["Nom", unit.name],
         ["Localisation", unit.location],
+        ["Statut", unit.status],
         ["Date de début", unit.start_date.strftime('%d/%m/%Y')],
-        ["Date de fin", unit.end_date.strftime('%d/%m/%Y') if unit.end_date else "Non définie"],
-        ["Statut", unit.get_status_display()]
+        ["Date de fin", unit.end_date.strftime('%d/%m/%Y') if unit.end_date else "Non définie"]
     ]
-
-    for row, (label, value) in enumerate(unit_info, start=5):
-        ws[f'A{row}'] = label
-        ws[f'B{row}'] = value
-
-    # Staff Information
-    current_row = 11
-    ws.merge_cells(f'A{current_row}:H{current_row}')
-    ws[f'A{current_row}'] = "Personnel Médical"
-    ws[f'A{current_row}'].font = title_font
-    ws[f'A{current_row}'].alignment = center_alignment
-
-    # Headers for medical staff
-    headers = ["Nom", "Spécialité", "Email", "Téléphone", "Date d'embauche"]
-    for col, header in enumerate(headers, start=1):
-        cell = ws.cell(row=current_row, column=col)
+    
+    for row_idx, (label, value) in enumerate(unit_info, start=current_row + 1):
+        ws[f'A{row_idx}'] = label
+        ws[f'B{row_idx}'] = value
+    
+    # Medical Staff Information
+    current_row = len(unit_info) + current_row + 2
+    ws[f'A{current_row}'] = "Personnel médical"
+    ws[f'A{current_row}'].font = header_font
+    ws[f'A{current_row}'].fill = header_fill
+    ws.merge_cells(f'A{current_row}:E{current_row}')
+    
+    staff_headers = ["Nom", "Rôle", "Email", "Téléphone", "Date d'embauche"]
+    for col_idx, header in enumerate(staff_headers, start=1):
+        cell = ws.cell(row=current_row + 1, column=col_idx)
         cell.value = header
         cell.font = header_font
         cell.fill = header_fill
-        cell.alignment = center_alignment
-
-    # Medical staff data
+    
     medical_staff = MedicalStaff.objects.filter(assigned_unit=unit)
-    for row, staff in enumerate(medical_staff, start=current_row + 1):
-        ws.cell(row=row, column=1, value=staff.name)
-        ws.cell(row=row, column=2, value=staff.get_role_display())
-        ws.cell(row=row, column=3, value=staff.email)
-        ws.cell(row=row, column=4, value=staff.phone_number or "Non renseigné")
-        ws.cell(row=row, column=5, value=staff.hire_date.strftime('%d/%m/%Y') if hasattr(staff, 'hire_date') else "Non renseigné")
-
+    for row_idx, staff in enumerate(medical_staff, start=current_row + 2):
+        ws[f'A{row_idx}'] = staff.name
+        ws[f'B{row_idx}'] = staff.get_role_display()
+        ws[f'C{row_idx}'] = staff.email
+        ws[f'D{row_idx}'] = staff.phone_number or "Non renseigné"
+    
     # Equipment Information
-    current_row += len(medical_staff) + 4
-    ws.merge_cells(f'A{current_row}:H{current_row}')
+    current_row = current_row + len(medical_staff) + 3
     ws[f'A{current_row}'] = "Équipements"
-    ws[f'A{current_row}'].font = title_font
-    ws[f'A{current_row}'].alignment = center_alignment
-
-    # Headers for equipment
-    headers = ["Nom", "Quantité", "Statut"]
-    for col, header in enumerate(headers, start=1):
-        cell = ws.cell(row=current_row, column=col)
+    ws[f'A{current_row}'].font = header_font
+    ws[f'A{current_row}'].fill = header_fill
+    ws.merge_cells(f'A{current_row}:E{current_row}')
+    
+    equipment_headers = ["Nom", "Quantité", "Statut"]
+    for col_idx, header in enumerate(equipment_headers, start=1):
+        cell = ws.cell(row=current_row + 1, column=col_idx)
         cell.value = header
         cell.font = header_font
         cell.fill = header_fill
-        cell.alignment = center_alignment
-
-    # Equipment data
+    
     equipment = Equipment.objects.filter(unit=unit)
-    for row, item in enumerate(equipment, start=current_row + 1):
-        ws.cell(row=row, column=1, value=item.name)
-        ws.cell(row=row, column=2, value=item.quantity)
-        ws.cell(row=row, column=3, value="En service" if item.quantity > 0 else "Épuisé")
-
+    for row_idx, item in enumerate(equipment, start=current_row + 2):
+        ws[f'A{row_idx}'] = item.name
+        ws[f'B{row_idx}'] = item.quantity
+        ws[f'C{row_idx}'] = "En stock" if item.quantity > 0 else "Rupture de stock"
+    
     # Interventions Information
-    current_row += len(equipment) + 4
-    ws.merge_cells(f'A{current_row}:H{current_row}')
+    current_row = current_row + len(equipment) + 3
     ws[f'A{current_row}'] = "Interventions"
-    ws[f'A{current_row}'].font = title_font
-    ws[f'A{current_row}'].alignment = center_alignment
-
-    # Headers for interventions
-    headers = ["Date", "Localisation", "Description", "Patients traités"]
-    for col, header in enumerate(headers, start=1):
-        cell = ws.cell(row=current_row, column=col)
+    ws[f'A{current_row}'].font = header_font
+    ws[f'A{current_row}'].fill = header_fill
+    ws.merge_cells(f'A{current_row}:E{current_row}')
+    
+    intervention_headers = ["Date", "Localisation", "Description", "Patients traités"]
+    for col_idx, header in enumerate(intervention_headers, start=1):
+        cell = ws.cell(row=current_row + 1, column=col_idx)
         cell.value = header
         cell.font = header_font
         cell.fill = header_fill
-        cell.alignment = center_alignment
-
-    # Interventions data
-    interventions = Intervention.objects.filter(unit=unit)
-    for row, intervention in enumerate(interventions, start=current_row + 1):
-        ws.cell(row=row, column=1, value=intervention.date.strftime('%d/%m/%Y'))
-        ws.cell(row=row, column=2, value=intervention.location)
-        ws.cell(row=row, column=3, value=intervention.description)
-        ws.cell(row=row, column=4, value=intervention.patients_treated)
-
+    
+    interventions = Intervention.objects.filter(unit=unit).order_by('-date')
+    for row_idx, intervention in enumerate(interventions, start=current_row + 2):
+        ws[f'A{row_idx}'] = intervention.date.strftime('%d/%m/%Y')
+        ws[f'B{row_idx}'] = intervention.location
+        ws[f'C{row_idx}'] = intervention.description
+        ws[f'D{row_idx}'] = intervention.patients_treated
+    
     # Adjust column widths
-    ws.column_dimensions['A'].width = 20
-    ws.column_dimensions['B'].width = 25
-    ws.column_dimensions['C'].width = 30
-    ws.column_dimensions['D'].width = 15
-    ws.column_dimensions['E'].width = 20
-    ws.column_dimensions['F'].width = 30
-    ws.column_dimensions['G'].width = 20
-    ws.column_dimensions['H'].width = 20
-
-    # Save the workbook to a BytesIO object
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
-
+    for col in range(1, 6):  # A to E
+        max_length = 0
+        column_letter = get_column_letter(col)
+        for row in range(1, ws.max_row + 1):
+            cell = ws.cell(row=row, column=col)
+            if cell.value:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+        adjusted_width = (max_length + 2)
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
     # Create the response
     response = HttpResponse(
-        output.read(),
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-    response['Content-Disposition'] = f'attachment; filename=rapport_{unit.name}_{datetime.now().strftime("%Y%m%d")}.xlsx'
+    response['Content-Disposition'] = f'attachment; filename=rapport_unite_{unit.name}.xlsx'
     
+    # Save the workbook to the response
+    wb.save(response)
     return response

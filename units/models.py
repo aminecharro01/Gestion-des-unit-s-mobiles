@@ -214,7 +214,6 @@ class MedicalRecord(models.Model):
 
     def __str__(self):
         return f"Record for {self.patient} on {self.date}"
-
 class UnitLocation(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -230,3 +229,4 @@ class UnitLocation(models.Model):
 
     def __str__(self):
         return f"Location update for {self.unit} at {self.timestamp}"
+

@@ -1,0 +1,83 @@
+{% extends 'units/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Liste des Interventions{% endblock %}
+
+{% block dashboard_content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Liste des Interventions</h1>
+            <p class="mt-1 text-sm text-gray-500">Gestion des interventions médicales</p>
+        </div>
+        <a href="{% url 'intervention_create' %}" 
+           class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Nouvelle Intervention
+        </a>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="mb-6">
+        <form method="get" class="flex gap-4">
+            <div class="flex-1">
+                <input type="text" name="search" value="{{ search_query }}" 
+                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                       placeholder="Rechercher une intervention...">
+            </div>
+            <button type="submit" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Filtrer
+            </button>
+        </form>
+    </div>
+
+    <!-- Interventions List -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unité</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patients Traités</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for intervention in interventions %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ intervention.date|date:"d/m/Y" }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ intervention.unit.name }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">{{ intervention.location }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ intervention.patients_treated }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{% url 'intervention_detail' intervention.id %}" class="text-blue-600 hover:text-blue-900 mr-4">Voir</a>
+                        <a href="{% url 'intervention_update' intervention.id %}" class="text-indigo-600 hover:text-indigo-900 mr-4">Modifier</a>
+                        <a href="{% url 'intervention_delete' intervention.id %}" class="text-red-600 hover:text-red-900">Supprimer</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                        Aucune intervention trouvée
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

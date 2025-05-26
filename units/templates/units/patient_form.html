@@ -1,0 +1,136 @@
+{% extends 'units/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold text-gray-900">
+                {% if form.instance.pk %}
+                    Modifier le Patient
+                {% else %}
+                    Nouveau Patient
+                {% endif %}
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                {% if form.instance.pk %}
+                    Modifier les informations du patient
+                {% else %}
+                    Enregistrer un nouveau patient
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            <form method="post" class="space-y-8 divide-y divide-gray-200">
+                {% csrf_token %}
+                
+                <!-- Personal Information -->
+                <div class="px-6 py-5">
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Prénom</label>
+                            <div class="mt-1">
+                                {{ form.first_name }}
+                            </div>
+                            {% if form.first_name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Nom</label>
+                            <div class="mt-1">
+                                {{ form.last_name }}
+                            </div>
+                            {% if form.last_name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.date_of_birth.id_for_label }}" class="block text-sm font-medium text-gray-700">Date de naissance</label>
+                            <div class="mt-1">
+                                {{ form.date_of_birth }}
+                            </div>
+                            {% if form.date_of_birth.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.date_of_birth.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.gender.id_for_label }}" class="block text-sm font-medium text-gray-700">Genre</label>
+                            <div class="mt-1">
+                                {{ form.gender }}
+                            </div>
+                            {% if form.gender.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.gender.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                            <div class="mt-1">
+                                {{ form.phone_number }}
+                            </div>
+                            {% if form.phone_number.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.phone_number.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-700">Adresse</label>
+                            <div class="mt-1">
+                                {{ form.address }}
+                            </div>
+                            {% if form.address.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.address.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.medical_history.id_for_label }}" class="block text-sm font-medium text-gray-700">Antécédents médicaux</label>
+                            <div class="mt-1">
+                                {{ form.medical_history }}
+                            </div>
+                            {% if form.medical_history.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.medical_history.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.allergies.id_for_label }}" class="block text-sm font-medium text-gray-700">Allergies</label>
+                            <div class="mt-1">
+                                {{ form.allergies }}
+                            </div>
+                            {% if form.allergies.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.allergies.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+                    <a href="{% url 'patient_list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Annuler
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {% if form.instance.pk %}
+                            Enregistrer les modifications
+                        {% else %}
+                            Créer le patient
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

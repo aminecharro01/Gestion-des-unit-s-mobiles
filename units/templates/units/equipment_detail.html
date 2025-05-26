@@ -1,0 +1,85 @@
+{% extends 'units/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Détails de l'Équipement{% endblock %}
+
+{% block dashboard_content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Détails de l'Équipement</h1>
+            <p class="mt-1 text-sm text-gray-500">Informations détaillées sur l'équipement</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{% url 'equipment_update' equipment.id %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Modifier
+            </a>
+            <a href="{% url 'equipment_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Retour à la liste
+            </a>
+        </div>
+    </div>
+
+    <!-- Equipment Details -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">{{ equipment.name }}</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Détails de l'équipement</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Catégorie</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ equipment.get_category_display }}</dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Quantité</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ equipment.quantity }}</dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Unité assignée</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {% if equipment.unit %}
+                            {{ equipment.unit.name }}
+                        {% else %}
+                            Non assigné
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Description</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ equipment.description|default:"Aucune description" }}</dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Dernière maintenance</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {% if equipment.last_maintenance %}
+                            {{ equipment.last_maintenance|date:"d/m/Y H:i" }}
+                        {% else %}
+                            Jamais
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Statut</dt>
+                    <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if equipment.status == 'active' %}bg-green-100 text-green-800
+                            {% elif equipment.status == 'maintenance' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ equipment.get_status_display }}
+                        </span>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %} 
+ 
+ 
+ 
+ 

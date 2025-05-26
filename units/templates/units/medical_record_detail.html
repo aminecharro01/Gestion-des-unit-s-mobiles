@@ -1,0 +1,133 @@
+{% extends 'units/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">Détails de la Consultation</h1>
+                <p class="mt-1 text-sm text-gray-500">Informations détaillées de la consultation médicale</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="{% url 'medical_record_update' record.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Modifier
+                </a>
+            </div>
+        </div>
+
+        <!-- Consultation Information -->
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-8">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Informations de la Consultation</h2>
+            </div>
+            <div class="px-6 py-5">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Patient</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            <a href="{% url 'patient_detail' record.patient.id %}" class="text-blue-600 hover:text-blue-900">
+                                {{ record.patient.first_name }} {{ record.patient.last_name }}
+                            </a>
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Date de consultation</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.date|date:"d/m/Y" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Médecin</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.doctor.get_full_name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Unité mobile</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            {% if record.unit %}
+                                <a href="{% url 'unit_detail' record.unit.id %}" class="text-blue-600 hover:text-blue-900">
+                                    {{ record.unit.name }}
+                                </a>
+                            {% else %}
+                                Non assignée
+                            {% endif %}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Medical Details -->
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-8">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Détails Médicaux</h2>
+            </div>
+            <div class="px-6 py-5">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Motif de consultation</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.reason|default:"Non renseigné" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Symptômes</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.symptoms|default:"Non renseignés" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Diagnostic</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.diagnosis|default:"Non renseigné" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Traitement prescrit</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.treatment|default:"Non renseigné" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Notes additionnelles</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ record.notes|default:"Aucune note" }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Prescribed Medications -->
+        {% if record.prescribed_medications.all %}
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-8">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Médicaments Prescrits</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médicament</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosage</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fréquence</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for medication in record.prescribed_medications.all %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ medication.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ medication.dosage }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ medication.frequency }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ medication.duration }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Back to Patient -->
+        <div class="mt-6">
+            <a href="{% url 'patient_detail' record.patient.id %}" class="text-sm text-blue-600 hover:text-blue-900">
+                ← Retour au dossier patient
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

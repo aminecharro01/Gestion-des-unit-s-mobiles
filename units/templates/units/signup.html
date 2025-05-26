@@ -1,0 +1,113 @@
+{% extends 'units/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-900 flex items-center justify-center p-4">
+    <div class="max-w-md w-full space-y-8 bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
+        <!-- Logo and Title -->
+        <div class="text-center">
+            <h2 class="mt-6 text-4xl font-extrabold text-white tracking-tight">
+                Créer un compte
+            </h2>
+            <p class="mt-2 text-sm text-gray-300">
+                Rejoignez notre plateforme
+            </p>
+        </div>
+
+        <!-- Signup Form -->
+        <form class="mt-8 space-y-6" method="post">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <!-- Username Field -->
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-300">
+                        Nom d'utilisateur
+                    </label>
+                    <div class="mt-1 relative">
+                        <input id="id_username" name="username" type="text" required
+                            class="appearance-none block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Choisissez un nom d'utilisateur">
+                        <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-300">
+                        Email
+                    </label>
+                    <div class="mt-1 relative">
+                        <input id="id_email" name="email" type="email" required
+                            class="appearance-none block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Entrez votre email">
+                        <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-300">
+                        Mot de passe
+                    </label>
+                    <div class="mt-1 relative">
+                        <input id="id_password1" name="password1" type="password" required
+                            class="appearance-none block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Créez un mot de passe">
+                        <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                </div>
+
+                <!-- Password Confirmation Field -->
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-300">
+                        Confirmer le mot de passe
+                    </label>
+                    <div class="mt-1 relative">
+                        <input id="id_password2" name="password2" type="password" required
+                            class="appearance-none block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            placeholder="Confirmez votre mot de passe">
+                        <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Messages -->
+            {% if form.errors %}
+            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-500 text-sm">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit"
+                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-blue-500/25">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-blue-300 group-hover:text-blue-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                        </svg>
+                    </span>
+                    Créer un compte
+                </button>
+            </div>
+
+            <!-- Login Link -->
+            <div class="text-center">
+                <p class="text-sm text-gray-300">
+                    Déjà un compte ?
+                    <a href="{% url 'login' %}" class="font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200">
+                        Se connecter
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

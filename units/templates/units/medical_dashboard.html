@@ -1,0 +1,371 @@
+{% extends 'units/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord Médical{% endblock %}
+
+{% block dashboard_content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-semibold text-gray-900">Tableau de Bord Médical</h1>
+        <p class="mt-1 text-sm text-gray-500">Bienvenue, {{ staff.name }}</p>
+    </div>
+
+    {% if no_unit_assigned %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                    Vous n'avez pas d'unité assignée. Veuillez contacter l'administrateur pour vous assigner une unité.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Patients</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ total_patients }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Interventions du Mois</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ monthly_interventions }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Dossiers Médicaux</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ total_medical_records }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Activités Récentes</h3>
+        </div>
+        <div class="border-t border-gray-200">
+            <ul class="divide-y divide-gray-200">
+                {% for activity in recent_activities %}
+                <li class="px-4 py-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">
+                                {{ activity.description }}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                {{ activity.timestamp|date:"d/m/Y " }}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="px-4 py-4 text-center text-sm text-gray-500">
+                    Aucune activité récente
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Patient Distribution -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Distribution des Patients</h3>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5">
+           
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
+    <!-- Personal Information -->
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Informations Personnelles</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500">Nom</p>
+                    <p class="text-base text-gray-900">{{ staff.name }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Rôle</p>
+                    <p class="text-base text-gray-900">{{ staff.role }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="text-base text-gray-900">{{ staff.email }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Téléphone</p>
+                    <p class="text-base text-gray-900">{{ staff.phone_number }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Unité Assignée</p>
+                    <p class="text-base text-gray-900">
+                        {% if staff.assigned_unit %}
+                            {{ staff.assigned_unit.name }}
+                        {% else %}
+                            Non assignée
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Actions Rapides</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="{% url 'intervention_list' %}" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100">
+                    <svg class="h-6 w-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-900">Gérer les Interventions</h3>
+                        <p class="text-sm text-gray-500">Voir et gérer les interventions</p>
+                    </div>
+                </a>
+                <a href="{% url 'patient_list' %}" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100">
+                    <svg class="h-6 w-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-900">Gérer les Patients</h3>
+                        <p class="text-sm text-gray-500">Voir et gérer les patients</p>
+                    </div>
+                </a>
+                <a href="{% url 'patient_list' %}" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100">
+                    <svg class="h-6 w-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-900">Accéder aux Dossiers Médicaux</h3>
+                        <p class="text-sm text-gray-500">Voir et gérer les dossiers médicaux</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Patients Totaux</h3>
+                    <p class="text-2xl font-semibold text-gray-900">{{ total_patients }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Interventions du Mois</h3>
+                    <p class="text-2xl font-semibold text-gray-900">{{ monthly_interventions }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Dossiers Médicaux</h3>
+                    <p class="text-2xl font-semibold text-gray-900">{{ total_medical_records }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-500">Heures de Service</h3>
+                    <p class="text-2xl font-semibold text-gray-900">{{ service_hours }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Interventions Chart -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Interventions par Mois</h2>
+            <canvas id="interventionsChart" height="300"></canvas>
+        </div>
+        <!-- Patient Distribution Chart -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Distribution des Patients</h2>
+            <canvas id="patientsChart" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Interventions -->
+    {% if unit_interventions %}
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Interventions Récentes de l'Unité</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lieu</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for intervention in unit_interventions|slice:":5" %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ intervention.date|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ intervention.location }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ intervention.description|truncatechars:50 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if unit_interventions.count > 5 %}
+            <div class="mt-4 text-right">
+                <a href="{% url 'intervention_list' %}" class="text-sm text-blue-600 hover:text-blue-900">
+                    Voir toutes les interventions →
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Interventions Chart
+        const interventionsCtx = document.getElementById('interventionsChart').getContext('2d');
+        new Chart(interventionsCtx, {
+            type: 'line',
+            data: {
+                labels: {{ intervention_months|safe }},
+                datasets: [{
+                    label: 'Nombre d\'interventions',
+                    data: {{ intervention_counts|safe }},
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Patients Distribution Chart
+        const patientsCtx = document.getElementById('patientsChart').getContext('2d');
+        new Chart(patientsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ patient_categories|safe }},
+                datasets: [{
+                    data: {{ patient_counts|safe }},
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(245, 158, 11, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

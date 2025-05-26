@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Utilisateurs</title></head>
+<body>
+    <h2>Liste des utilisateurs</h2>
+    <ul>
+        {% for user in users %}
+            <li>{{ user.username }} – {{ user.email }} – <a href="#">Modifier</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'dashboard' %}">Retour</a>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends 'units/base_dashboard.html' %}
+
+{% block dashboard_content %}
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Tableau de Bord des Rapports</h1>
+        <p class="mt-1 text-sm text-gray-600">Générez et gérez les rapports pour vos unités mobiles</p>
+    </div>
+
+    <!-- Unit Reports Section -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Rapports par Unité</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for unit in units %}
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-medium text-gray-900">{{ unit.name }}</h3>
+                        <span class="px-2 py-1 text-xs font-medium rounded-full {% if unit.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ unit.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">{{ unit.location }}</p>
+                    <div class="flex space-x-2">
+                        <a href="{% url 'unit_report' unit.id %}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Générer Rapport
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full">
+                    <p class="text-gray-500 text-center py-4">Aucune unité mobile trouvée.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Types Section -->
+    <div class="mt-6 bg-white rounded-lg shadow">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Types de Rapports Disponibles</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Rapport d'Activité</h3>
+                    <p class="text-sm text-gray-600 mb-4">Statistiques détaillées sur les interventions et le personnel médical.</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Rapport d'Équipement</h3>
+                    <p class="text-sm text-gray-600 mb-4">État et utilisation des équipements médicaux.</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Rapport de Performance</h3>
+                    <p class="text-sm text-gray-600 mb-4">Métriques de performance et efficacité opérationnelle.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

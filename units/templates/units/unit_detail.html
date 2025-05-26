@@ -1,0 +1,211 @@
+{% extends 'units/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">{{ unit.name }}</h1>
+                <p class="mt-1 text-sm text-gray-500">Détails de l'unité mobile</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="{% url 'unit_update' unit.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Modifier
+                </a>
+                <a href="{% url 'unit_delete' unit.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Supprimer
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Basic Info -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Status Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-medium text-gray-900">Statut</h2>
+                                <p class="mt-1 text-sm text-gray-500">État actuel de l'unité</p>
+                            </div>
+                            <span class="px-3 py-1 text-sm font-medium rounded-full
+                                {% if unit.status == 'active' %}bg-green-100 text-green-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ unit.status|title }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900">Localisation</h2>
+                        <p class="mt-2 text-gray-600">{{ unit.location }}</p>
+                    </div>
+                </div>
+
+                <!-- Dates Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900">Dates</h2>
+                        <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Date de début</dt>
+                                <dd class="mt-1 text-gray-900">{{ unit.start_date|date:"d/m/Y" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Date de fin</dt>
+                                <dd class="mt-1 text-gray-900">{{ unit.end_date|date:"d/m/Y"|default:"Non définie" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Durée</dt>
+                                <dd class="mt-1 text-gray-900">{{ unit.duration }} jours</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Jours restants</dt>
+                                <dd class="mt-1">
+                                    {% if unit.days_remaining is not None %}
+                                        <span class="px-2 py-1 text-sm font-medium rounded-full
+                                            {% if unit.days_remaining <= 7 %}bg-red-100 text-red-800
+                                            {% elif unit.days_remaining <= 30 %}bg-yellow-100 text-yellow-800
+                                            {% else %}bg-green-100 text-green-800{% endif %}">
+                                            {{ unit.days_remaining }} jours
+                                        </span>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Staff Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-medium text-gray-900">Personnel</h2>
+                            <a href="{% url 'staff_create' %}?unit={{ unit.id }}" 
+                               class="text-sm text-blue-600 hover:text-blue-900">
+                                + Ajouter
+                            </a>
+                        </div>
+                        {% if unit.staff_set.all %}
+                            <ul class="mt-4 divide-y divide-gray-200">
+                                {% for staff in unit.staff_set.all %}
+                                    <li class="py-3 flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">{{ staff.name }}</p>
+                                            <p class="text-sm text-gray-500">{{ staff.email }}</p>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <a href="{% url 'staff_update' staff.id %}" class="text-blue-600 hover:text-blue-900">Modifier</a>
+                                            <a href="{% url 'staff_delete' staff.id %}" class="text-red-600 hover:text-red-900">Supprimer</a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="mt-4 text-sm text-gray-500">Aucun personnel assigné</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Equipment Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-medium text-gray-900">Équipement</h2>
+                            <a href="{% url 'equipment_create' %}?unit={{ unit.id }}" 
+                               class="text-sm text-blue-600 hover:text-blue-900">
+                                + Ajouter
+                            </a>
+                        </div>
+                        {% if unit.equipment_set.all %}
+                            <ul class="mt-4 divide-y divide-gray-200">
+                                {% for equipment in unit.equipment_set.all %}
+                                    <li class="py-3">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">{{ equipment.name }}</p>
+                                                <p class="text-sm text-gray-500">Quantité: {{ equipment.quantity }}</p>
+                                            </div>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                                {% if equipment.status == 'available' %}bg-green-100 text-green-800
+                                                {% elif equipment.status == 'in_use' %}bg-yellow-100 text-yellow-800
+                                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                                {{ equipment.status|title }}
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="mt-4 text-sm text-gray-500">Aucun équipement assigné</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Interventions Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-medium text-gray-900">Interventions</h2>
+                            <a href="{% url 'intervention_create' %}?unit={{ unit.id }}" 
+                               class="text-sm text-blue-600 hover:text-blue-900">
+                                + Ajouter
+                            </a>
+                        </div>
+                        {% if unit.intervention_set.all %}
+                            <ul class="mt-4 divide-y divide-gray-200">
+                                {% for intervention in unit.intervention_set.all %}
+                                    <li class="py-3">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">{{ intervention.location }}</p>
+                                                <p class="text-sm text-gray-500">{{ intervention.date|date:"d/m/Y" }}</p>
+                                            </div>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                                {% if intervention.status == 'scheduled' %}bg-blue-100 text-blue-800
+                                                {% elif intervention.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                                {% elif intervention.status == 'completed' %}bg-green-100 text-green-800
+                                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                                {{ intervention.status|title }}
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="mt-4 text-sm text-gray-500">Aucune intervention planifiée</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to List -->
+        <div class="mt-8">
+            <a href="{% url 'unit_list' %}" class="text-sm text-blue-600 hover:text-blue-900">
+                ← Retour à la liste des unités
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

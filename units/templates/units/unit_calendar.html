@@ -1,0 +1,154 @@
+{% extends 'units/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Calendrier des Unités Mobiles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+<style>
+    .fc-event {
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 2px 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .fc-event.active {
+        background-color: #059669;
+        border-color: #059669;
+    }
+    .fc-event.inactive {
+        background-color: #dc2626;
+        border-color: #dc2626;
+    }
+    .fc-toolbar-title {
+        font-size: 1.25rem !important;
+        font-weight: 600 !important;
+        color: #111827 !important;
+    }
+    .fc-button-primary {
+        background-color: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 0.375rem !important;
+    }
+    .fc-button-primary:hover {
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
+    }
+    .fc-button-primary:disabled {
+        background-color: #93c5fd !important;
+        border-color: #93c5fd !important;
+    }
+    .fc-daygrid-day-number {
+        color: #4b5563 !important;
+        font-weight: 500 !important;
+    }
+    .fc-col-header-cell {
+        background-color: #f3f4f6 !important;
+        padding: 0.5rem 0 !important;
+    }
+    .fc-col-header-cell-cushion {
+        color: #374151 !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+    }
+    .fc-day-today {
+        background-color: #eff6ff !important;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8 flex justify-between items-center">
+        <h1 class="text-2xl font-semibold text-gray-900">Calendrier des Unités Mobiles</h1>
+        <div class="flex space-x-4">
+            <a href="{% url 'unit_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Vue Liste
+            </a>
+            <a href="{% url 'unit_create' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Ajouter une Unité
+            </a>
+        </div>
+    </div>
+
+    <!-- Calendar Container -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="p-4">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="mt-4 flex items-center space-x-4 text-sm">
+        <span class="text-gray-500">Légende:</span>
+        <div class="flex items-center">
+            <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+            <span class="text-gray-700">Unité Active</span>
+        </div>
+        <div class="flex items-center">
+            <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
+            <span class="text-gray-700">Unité Inactive</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'fr',
+            buttonText: {
+                today: "Aujourd'hui",
+                month: 'Mois',
+                week: 'Semaine',
+                day: 'Jour'
+            },
+            events: [
+                {% for unit in units %}
+                {
+                    title: '{{ unit.name }}',
+                    start: '{{ unit.start_date|date:"Y-m-d" }}',
+                    end: '{{ unit.end_date|date:"Y-m-d" }}',
+                    className: '{{ unit.status }}',
+                    url: '{% url "unit_detail" unit.id %}',
+                    extendedProps: {
+                        location: '{{ unit.location }}',
+                        status: '{{ unit.status }}'
+                    }
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            eventDidMount: function(info) {
+                // Add tooltip with additional information
+                info.el.title = `${info.event.title}\nLocalisation: ${info.event.extendedProps.location}\nStatut: ${info.event.extendedProps.status}`;
+            },
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                window.location.href = info.event.url;
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %} 

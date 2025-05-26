@@ -1,0 +1,186 @@
+{% extends 'units/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold text-gray-900">
+                {% if form.instance.pk %}
+                    Modifier la Consultation
+                {% else %}
+                    Nouvelle Consultation
+                {% endif %}
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                {% if form.instance.pk %}
+                    Modifier les détails de la consultation
+                {% else %}
+                    Enregistrer une nouvelle consultation
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            {% if form_errors %}
+            <div class="p-4 bg-red-50 border-l-4 border-red-400">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">
+                            Erreurs de validation
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for field, errors in form_errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="post" class="space-y-8 divide-y divide-gray-200">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div class="px-6 py-5">
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.unit.id_for_label }}" class="block text-sm font-medium text-gray-700">Unité Mobile</label>
+                            <div class="mt-1">
+                                {{ form.unit }}
+                            </div>
+                            {% if form.unit.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.unit.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="{{ form.doctor.id_for_label }}" class="block text-sm font-medium text-gray-700">Médecin</label>
+                            <div class="mt-1">
+                                {{ form.doctor }}
+                            </div>
+                            {% if form.doctor.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.doctor.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Information -->
+                <div class="px-6 py-5">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Informations Médicales</h3>
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.diagnosis.id_for_label }}" class="block text-sm font-medium text-gray-700">Diagnostic</label>
+                            <div class="mt-1">
+                                {{ form.diagnosis }}
+                            </div>
+                            {% if form.diagnosis.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.diagnosis.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.treatment.id_for_label }}" class="block text-sm font-medium text-gray-700">Traitement</label>
+                            <div class="mt-1">
+                                {{ form.treatment }}
+                            </div>
+                            {% if form.treatment.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.treatment.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.prescription.id_for_label }}" class="block text-sm font-medium text-gray-700">Ordonnance</label>
+                            <div class="mt-1">
+                                {{ form.prescription }}
+                            </div>
+                            {% if form.prescription.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.prescription.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700">Notes additionnelles</label>
+                            <div class="mt-1">
+                                {{ form.notes }}
+                            </div>
+                            {% if form.notes.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.notes.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+                    <a href="{% url 'patient_detail' patient.id %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Annuler
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {% if form.instance.pk %}
+                            Enregistrer les modifications
+                        {% else %}
+                            Créer la consultation
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const unitSelect = document.getElementById('id_unit');
+    const doctorSelect = document.getElementById('id_doctor');
+    
+    // Function to update doctors based on selected unit
+    function updateDoctors() {
+        const unitId = unitSelect.value;
+        if (!unitId) {
+            doctorSelect.innerHTML = '<option value="">---------</option>';
+            return;
+        }
+
+        // Fetch doctors for the selected unit
+        fetch(`/api/units/${unitId}/doctors/`)
+            .then(response => response.json())
+            .then(data => {
+                doctorSelect.innerHTML = '<option value="">---------</option>';
+                data.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.id;
+                    option.textContent = `${doctor.first_name} ${doctor.last_name}`;
+                    doctorSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Update doctors when unit selection changes
+    unitSelect.addEventListener('change', updateDoctors);
+    
+    // Initial update if a unit is pre-selected
+    if (unitSelect.value) {
+        updateDoctors();
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,139 @@
+{% extends 'units/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}Modifier{% else %}Créer{% endif %} Personnel Médical
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-semibold text-gray-900">
+            {% if form.instance.pk %}Modifier{% else %}Créer{% endif %} Personnel Médical
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+            {% if form.instance.pk %}
+                Mettez à jour les informations du personnel médical
+            {% else %}
+                Remplissez les informations pour créer un nouveau membre du personnel médical
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="space-y-2">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ field.label }}
+                </label>
+                <div class="relative">
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="mt-1 text-red-600 text-sm">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                    <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <a href="javascript:history.back()" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Annuler
+                </a>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {% if form.instance.pk %}Mettre à jour{% else %}Créer{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Custom styles for form fields -->
+<style>
+    /* Style all form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="time"],
+    input[type="url"],
+    input[type="tel"],
+    textarea,
+    select {
+        @apply w-full px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+        color: #111827 !important; /* Force dark text color */
+        font-size: 0.875rem !important; /* text-sm */
+        line-height: 1.25rem !important; /* leading-5 */
+    }
+
+
+
+    /* Style checkboxes */
+    input[type="checkbox"] {
+        @apply w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500;
+    }
+
+    /* Style radio buttons */
+    input[type="radio"] {
+        @apply w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500;
+    }
+
+    /* Style file inputs */
+    input[type="file"] {
+        @apply block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100;
+    }
+
+    /* Override any Django form widget styles */
+    .form-control {
+        color: #111827 !important;
+    }
+
+    /* Ensure text is visible in all form elements */
+    input::placeholder,
+    textarea::placeholder {
+        color: #9CA3AF !important;
+    }
+
+    /* Style for disabled inputs */
+    input:disabled,
+    textarea:disabled,
+    select:disabled {
+        @apply bg-gray-100 text-gray-500;
+    }
+
+    /* Style for textarea */
+    textarea {
+        min-height: 100px;
+    }
+
+    /* Style for date inputs */
+    input[type="date"] {
+        @apply cursor-pointer;
+    }
+
+    /* Style for number inputs */
+    input[type="number"] {
+        @apply cursor-text;
+    }
+</style>
+{% endblock %} 
